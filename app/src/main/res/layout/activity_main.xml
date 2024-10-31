@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="48dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <SearchView
+                android:id="@+id/search"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="-16dp"
+                android:layout_weight="1"
+                android:iconifiedByDefault="false"
+                android:queryHint="Search..."
+                android:searchIcon="@null" />
+
+            <ToggleButton
+                android:id="@+id/orangeButton"
+                android:layout_width="48dp"
+                android:layout_height="match_parent"
+                android:background="@color/lightIllinoisOrange"
+                android:checked="true"
+                android:contentDescription="Show only orange RSOs"
+                android:textColor="@color/lightTextColor"
+                android:textOff="\u2610"
+                android:textOn="\u2611"
+                android:textSize="32sp" />
+
+            <ToggleButton
+                android:id="@+id/blueButton"
+                android:layout_width="48dp"
+                android:layout_height="match_parent"
+                android:background="@color/lightIllinoisBlue"
+                android:checked="true"
+                android:contentDescription="Show only blue RSOs"
+                android:textColor="@color/lightTextColor"
+                android:textOff="\u2610"
+                android:textOn="\u2611"
+                android:textSize="32sp" />
+
+        </LinearLayout>
+
+    </Toolbar>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </FrameLayout>
+
+</LinearLayout>

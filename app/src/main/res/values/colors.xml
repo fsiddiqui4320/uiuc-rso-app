@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#13294b</color>
+    <color name="colorPrimaryDark">#13294b</color>
+    <color name="colorAccent">#E84A27</color>
+    <color name="darkTextColor">#444444</color>
+    <color name="lightTextColor">#DDDDDD</color>
+    <color name="illinoisBlue">#13294b</color>
+    <color name="illinoisOrange">#E84A27</color>
+    <color name="lightIllinoisBlue">#7aa1dd</color>
+    <color name="lightIllinoisOrange">#f1927d</color>
+    <color name="lighterIllinoisBlue">#bdd0ee</color>
+    <color name="lighterIllinoisOrange">#fadbd4</color>
+    <color name="departmentColor">#dddddd</color>
+</resources>
