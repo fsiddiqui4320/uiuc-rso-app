@@ -118,7 +118,7 @@ public class Summary implements Comparable<Summary> {
   }
 
   public static List<Summary> filterColor(List<Summary> inputlist, Set<Color> colors) {
-     return inputlist;
+    return inputlist;
   }
 
   public static List<Summary> search(List<Summary> inputlist, String searchTerm) {
