@@ -37,7 +37,7 @@ public final class MainActivity extends Activity implements SearchView.OnQueryTe
 
     // Load this activity's layout and set the title
     setContentView(R.layout.activity_main);
-    setTitle("Discover RSO");
+    setTitle("Discover RSOs");
 
     // Set up the list adapter for the list of RSO summaries
     listAdapter = new SummaryListAdapter(summaries, this);

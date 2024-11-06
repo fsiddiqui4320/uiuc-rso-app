@@ -2,7 +2,9 @@ package edu.illinois.cs.cs124.ay2024.mp.models;
 
 import androidx.annotation.NonNull;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Model holding summary information about an RSO.
@@ -13,7 +15,7 @@ import java.util.Objects;
  * <p>The RSO model which you will add in MP2 extends this model and holds the remainder of the
  * provided RSO data.
  */
-public class Summary {
+public class Summary implements Comparable<Summary> {
   /** Unique ID used to identify each RSO. */
   @NonNull private final String id;
 
@@ -29,6 +31,7 @@ public class Summary {
   public final String getTitle() {
     return title;
   }
+
 
   /**
    * RSOs are categorized by color, based on whether officers serve academic-year (orange) or
@@ -107,5 +110,18 @@ public class Summary {
   @Override
   public int hashCode() {
     return Objects.hash(id);
+  }
+
+  @Override
+  public int compareTo(Summary o) {
+    return 0;
+  }
+
+  public static List<Summary> filterColor(List<Summary> inputlist, Set<Color> colors) {
+     return inputlist;
+  }
+
+  public static List<Summary> search(List<Summary> inputlist, String searchTerm) {
+    return inputlist;
   }
 }
