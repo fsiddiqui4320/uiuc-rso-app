@@ -174,11 +174,8 @@ public class Summary implements Comparable<Summary> {
               (e1, e2) -> e1,
               LinkedHashMap::new
           ));
-
-
       return new ArrayList<>(sortedMap.keySet());
-    }
-    else {
+    } else {
       for (Summary summary : inputlist) {
         if (summary.getTitle().toLowerCase().contains(searchTerm)) {
           result.add(summary);

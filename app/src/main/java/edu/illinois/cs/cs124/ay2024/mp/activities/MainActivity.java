@@ -1,7 +1,6 @@
 package edu.illinois.cs.cs124.ay2024.mp.activities;
 
 import static edu.illinois.cs.cs124.ay2024.mp.models.Summary.filterColor;
-import static edu.illinois.cs.cs124.ay2024.mp.models.Summary.search;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
@@ -76,8 +75,7 @@ public final class MainActivity extends Activity implements SearchView.OnQueryTe
     if (checked) {
       shownColors.add(Summary.Color.ORANGE);
       onStart();
-    }
-    else {
+    } else {
       shownColors.remove(Summary.Color.ORANGE);
     }
     List<Summary> filteredSummaries = filterColor(summaries, shownColors);
