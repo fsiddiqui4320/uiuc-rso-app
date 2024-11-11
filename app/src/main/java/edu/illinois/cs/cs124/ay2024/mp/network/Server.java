@@ -13,7 +13,6 @@ import edu.illinois.cs.cs124.ay2024.mp.models.Summary;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;

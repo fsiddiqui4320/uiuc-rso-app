@@ -122,22 +122,26 @@ public class Summary implements Comparable<Summary> {
   }
 
   @Override
-  public int compareTo(Summary o) {return this.title.compareTo(o.title);}
+  public int compareTo(Summary o) {
+    return this.title.compareTo(o.title);
+  }
 
   public static List<Summary> filterColor(List<Summary> inputlist, Set<Color> colors) {
     Collections.sort(inputlist);
     for (int i = inputlist.size() - 1; i >= 0; i--) {
       Summary summary = inputlist.get(i);
-      if (!colors.contains(summary.color)) inputlist.remove(summary);
+      if (!colors.contains(summary.color)) {
+        inputlist.remove(summary);
+      }
     }
     return inputlist;
   }
 
-  public static List<Summary> search(List<Summary> inputlist, String searchTerm) {
+  public static List<Summary> search(List<Summary> inputlist, String search) {
     List<Summary> result = new ArrayList<>();
     Map<Summary, Integer> map = new HashMap<>();
 
-    searchTerm = searchTerm.trim().toLowerCase();
+    String searchTerm = search.trim().toLowerCase();
 
     if (searchTerm.isEmpty()) {
       result.addAll(inputlist);
@@ -150,8 +154,7 @@ public class Summary implements Comparable<Summary> {
         if (word.equals(searchTerm)) {
           if (map.containsKey(summary)) {
             map.put(summary, map.get(summary) + 1);
-          }
-          else {
+          } else {
             result.add(summary);
             map.put(summary, 1);
           }
@@ -173,8 +176,7 @@ public class Summary implements Comparable<Summary> {
           ));
 
 
-      List<Summary> sortedList = new ArrayList<>(sortedMap.keySet());
-      return sortedList;
+      return new ArrayList<>(sortedMap.keySet());
     }
     else {
       for (Summary summary : inputlist) {
@@ -184,6 +186,18 @@ public class Summary implements Comparable<Summary> {
       }
     }
     return result;
-
+//    while (!map.isEmpty()) {
+//      Summary max = null;
+//
+//      int maxCount = (Collections.max(map.values()));
+//      for (Map.Entry<Summary, Integer> entry : map.entrySet()) {
+//        if (entry.getValue() == maxCount) {
+//          max = entry.getKey();
+//        }
+//        result.add(max);
+//        map.remove(max);
+//      }
+//    }
+//    return result;
   }
 }

@@ -92,8 +92,7 @@ public final class MainActivity extends Activity implements SearchView.OnQueryTe
     if (checked) {
       shownColors.add(Summary.Color.BLUE);
       onStart();
-    }
-    else {
+    } else {
       shownColors.remove(Summary.Color.BLUE);
     }
     List<Summary> filteredSummaries = filterColor(summaries, shownColors);
@@ -139,8 +138,8 @@ public final class MainActivity extends Activity implements SearchView.OnQueryTe
   @Override
   public boolean onQueryTextChange(@NonNull String query) {
     List<Summary> filteredSummaries = Summary.search(summaries, query);
-    List<String> filteredIDs = new ArrayList<String>();
-    List<String> filteredTitles = new ArrayList<String>();
+    List<String> filteredIDs = new ArrayList<>();
+    List<String> filteredTitles = new ArrayList<>();
 
     for (Summary summary : filteredSummaries) {
       filteredIDs.add(summary.getId());
