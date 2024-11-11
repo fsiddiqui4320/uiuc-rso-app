@@ -2,9 +2,17 @@ package edu.illinois.cs.cs124.ay2024.mp.models;
 
 import androidx.annotation.NonNull;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.LinkedHashMap;
+
 
 /**
  * Model holding summary information about an RSO.
@@ -31,6 +39,7 @@ public class Summary implements Comparable<Summary> {
   public final String getTitle() {
     return title;
   }
+
 
 
   /**
@@ -113,15 +122,68 @@ public class Summary implements Comparable<Summary> {
   }
 
   @Override
-  public int compareTo(Summary o) {
-    return 0;
-  }
+  public int compareTo(Summary o) {return this.title.compareTo(o.title);}
 
   public static List<Summary> filterColor(List<Summary> inputlist, Set<Color> colors) {
+    Collections.sort(inputlist);
+    for (int i = inputlist.size() - 1; i >= 0; i--) {
+      Summary summary = inputlist.get(i);
+      if (!colors.contains(summary.color)) inputlist.remove(summary);
+    }
     return inputlist;
   }
 
   public static List<Summary> search(List<Summary> inputlist, String searchTerm) {
-    return inputlist;
+    List<Summary> result = new ArrayList<>();
+    Map<Summary, Integer> map = new HashMap<>();
+
+    searchTerm = searchTerm.trim().toLowerCase();
+
+    if (searchTerm.isEmpty()) {
+      result.addAll(inputlist);
+      return result;
+    }
+
+    for (Summary summary : inputlist) {
+      String[] words = summary.getTitle().toLowerCase().split(" ");
+      for (String word : words) {
+        if (word.equals(searchTerm)) {
+          if (map.containsKey(summary)) {
+            map.put(summary, map.get(summary) + 1);
+          }
+          else {
+            result.add(summary);
+            map.put(summary, 1);
+          }
+        }
+      }
+    }
+
+    if (!map.isEmpty()) {
+
+      Map<Summary, Integer> sortedMap = map.entrySet()
+          .stream()
+          .sorted(Comparator.comparing(Map.Entry<Summary, Integer>::getValue).reversed()
+              .thenComparing(Map.Entry::getKey))
+          .collect(Collectors.toMap(
+              Map.Entry::getKey,
+              Map.Entry::getValue,
+              (e1, e2) -> e1,
+              LinkedHashMap::new
+          ));
+
+
+      List<Summary> sortedList = new ArrayList<>(sortedMap.keySet());
+      return sortedList;
+    }
+    else {
+      for (Summary summary : inputlist) {
+        if (summary.getTitle().toLowerCase().contains(searchTerm)) {
+          result.add(summary);
+        }
+      }
+    }
+    return result;
+
   }
 }

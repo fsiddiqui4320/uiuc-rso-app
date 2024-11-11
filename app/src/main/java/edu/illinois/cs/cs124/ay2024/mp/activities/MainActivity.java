@@ -1,9 +1,13 @@
 package edu.illinois.cs.cs124.ay2024.mp.activities;
 
+import static edu.illinois.cs.cs124.ay2024.mp.models.Summary.filterColor;
+import static edu.illinois.cs.cs124.ay2024.mp.models.Summary.search;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.CompoundButton;
 import android.widget.SearchView;
+import android.widget.ToggleButton;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -12,8 +16,12 @@ import edu.illinois.cs.cs124.ay2024.mp.R;
 import edu.illinois.cs.cs124.ay2024.mp.adapters.SummaryListAdapter;
 import edu.illinois.cs.cs124.ay2024.mp.application.JoinableApplication;
 import edu.illinois.cs.cs124.ay2024.mp.models.Summary;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Main activity showing RSO summaries and enabling filtering and searching.
@@ -52,9 +60,48 @@ public final class MainActivity extends Activity implements SearchView.OnQueryTe
     SearchView searchView = findViewById(R.id.search);
     searchView.setOnQueryTextListener(this);
 
-    // Register our toolbar
-    setActionBar(findViewById(R.id.toolbar));
+    ToggleButton orangeButton = findViewById(R.id.orangeButton);
+    orangeButton.setOnCheckedChangeListener(orangeButtonListener);
+
+    ToggleButton blueButton = findViewById(R.id.blueButton);
+    blueButton.setOnCheckedChangeListener(blueButtonListener);
   }
+
+  private final Set<Summary.Color> shownColors = new HashSet<>(Arrays.asList(
+      Summary.Color.ORANGE, Summary.Color.BLUE, Summary.Color.DEPARTMENT
+  ));
+
+  private final CompoundButton.OnCheckedChangeListener orangeButtonListener = (unused, checked) -> {
+    Log.d(TAG, "Orange button checked " + checked);
+    if (checked) {
+      shownColors.add(Summary.Color.ORANGE);
+      onStart();
+    }
+    else {
+      shownColors.remove(Summary.Color.ORANGE);
+    }
+    List<Summary> filteredSummaries = filterColor(summaries, shownColors);
+    listAdapter.setSummaries(filteredSummaries);
+    listAdapter.notifyDataSetChanged();
+    onStart();
+    Log.d(TAG, "Currently shown colors: " + shownColors);
+  };
+
+  private final CompoundButton.OnCheckedChangeListener blueButtonListener = (unused, checked) -> {
+    Log.d(TAG, "Blue button checked " + checked);
+    if (checked) {
+      shownColors.add(Summary.Color.BLUE);
+      onStart();
+    }
+    else {
+      shownColors.remove(Summary.Color.BLUE);
+    }
+    List<Summary> filteredSummaries = filterColor(summaries, shownColors);
+    listAdapter.setSummaries(filteredSummaries);
+    listAdapter.notifyDataSetChanged();
+    onStart();
+    Log.d(TAG, "Currently shown colors: " + shownColors);
+  };
 
   /** {@inheritDoc} */
   @Override
@@ -69,7 +116,10 @@ public final class MainActivity extends Activity implements SearchView.OnQueryTe
             (result) -> {
               // Update the list shown to the user in a callback
               try {
-                summaries = result.getValue();
+                Log.d(TAG, "Initial size: " + result.getValue().size());
+                summaries = filterColor(result.getValue(), shownColors);
+                Log.d(TAG, "Filtered size: " + summaries.size());
+                Collections.sort(summaries);
                 listAdapter.setSummaries(summaries);
               } catch (Exception e) {
                 Log.e(TAG, "Error updating summary list", e);
@@ -88,6 +138,17 @@ public final class MainActivity extends Activity implements SearchView.OnQueryTe
    */
   @Override
   public boolean onQueryTextChange(@NonNull String query) {
+    List<Summary> filteredSummaries = Summary.search(summaries, query);
+    List<String> filteredIDs = new ArrayList<String>();
+    List<String> filteredTitles = new ArrayList<String>();
+
+    for (Summary summary : filteredSummaries) {
+      filteredIDs.add(summary.getId());
+      filteredTitles.add(summary.getId());
+    }
+    Log.d(TAG, "Filtered IDs: " + filteredIDs + "\n Filtered IDs: " + filteredIDs);
+    listAdapter.setSummaries(filteredSummaries);
+    listAdapter.notifyDataSetChanged();
     return true;
   }
 
