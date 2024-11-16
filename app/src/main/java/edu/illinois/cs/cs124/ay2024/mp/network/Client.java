@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import edu.illinois.cs.cs124.ay2024.mp.application.JoinableApplication;
 import edu.illinois.cs.cs124.ay2024.mp.helpers.ResultMightThrow;
+import edu.illinois.cs.cs124.ay2024.mp.models.RSO;
 import edu.illinois.cs.cs124.ay2024.mp.models.Summary;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -41,6 +42,9 @@ import java.util.stream.Collectors;
 public final class Client {
   private static final String TAG = Client.class.getSimpleName();
 
+  public void getRSO(@NonNull String id, @NonNull final Consumer<ResultMightThrow<RSO>> callback) {
+    throw new IllegalStateException("Not implemented");
+  }
   /**
    * Retrieve the list of RSO summaries.
    *
