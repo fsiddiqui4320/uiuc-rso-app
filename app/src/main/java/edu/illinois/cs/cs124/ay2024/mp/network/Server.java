@@ -123,7 +123,7 @@ public final class Server extends Dispatcher {
         return makeOKJSONResponse("200: OK");
       } else if (path.equals("/summary") && method.equals("GET")) {
         return getSummaries();
-      } else if (path.startsWith("/rso") && method.equals("GET")){
+      } else if (path.startsWith("/rso") && method.equals("GET")) {
         return getRSO(path);
       } else {
         // Default is not found
