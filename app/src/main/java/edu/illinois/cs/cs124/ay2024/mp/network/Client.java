@@ -43,7 +43,21 @@ public final class Client {
   private static final String TAG = Client.class.getSimpleName();
 
   public void getRSO(@NonNull String id, @NonNull final Consumer<ResultMightThrow<RSO>> callback) {
-    throw new IllegalStateException("Not implemented");
+    StringRequest rsoRequest =
+        new StringRequest(
+            Request.Method.GET,
+            JoinableApplication.SERVER_URL + "/rso/" + id,
+            response -> {
+              try {
+                RSO rso =
+                    OBJECT_MAPPER.readValue(response, new TypeReference<>() {});
+                callback.accept(new ResultMightThrow<>(rso));
+              } catch (JsonProcessingException e) {
+                callback.accept(new ResultMightThrow<>(e));
+              }
+            },
+            error -> callback.accept(new ResultMightThrow<>(error)));
+    requestQueue.add(rsoRequest);
   }
   /**
    * Retrieve the list of RSO summaries.

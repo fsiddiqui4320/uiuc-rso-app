@@ -1,7 +1,9 @@
 package edu.illinois.cs.cs124.ay2024.mp.activities;
 
+import static org.junit.Assert.assertNotNull;
 import static edu.illinois.cs.cs124.ay2024.mp.models.Summary.filterColor;
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.CompoundButton;
@@ -34,6 +36,7 @@ public final class MainActivity extends Activity implements SearchView.OnQueryTe
   /** List of RSO summaries received from the server, initially empty. */
   private List<Summary> summaries = Collections.emptyList();
 
+
   /** Adapter that connects our list of summaries with the UI displayed to the user. */
   private SummaryListAdapter listAdapter;
 
@@ -47,7 +50,16 @@ public final class MainActivity extends Activity implements SearchView.OnQueryTe
     setTitle("Discover RSOs");
 
     // Set up the list adapter for the list of RSO summaries
-    listAdapter = new SummaryListAdapter(summaries, this);
+    listAdapter = new SummaryListAdapter(summaries, this, summary -> {
+      Log.d(TAG, "User clicked on " + summary.getTitle());
+      Intent rsoActivity = new Intent(this, RSOActivity.class);
+      assertNotNull("Intent component is null", rsoActivity.getComponent());
+      rsoActivity.putExtra("id", summary.getId());
+      Log.d("TEST", "Intent Action: " + rsoActivity.getAction());
+      Log.d("TEST", "Intent Component: " + rsoActivity.getComponent());
+      Log.d("TEST", "Intent Extras: " + rsoActivity.getExtras());
+      startActivity(rsoActivity);
+    });
 
     // Add the list to the layout
     RecyclerView recyclerView = findViewById(R.id.recycler_view);

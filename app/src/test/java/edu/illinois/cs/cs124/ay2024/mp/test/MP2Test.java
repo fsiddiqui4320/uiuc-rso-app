@@ -35,6 +35,7 @@ import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import com.fasterxml.jackson.databind.JsonNode;
 import edu.illinois.cs.cs124.ay2024.mp.R;
+import edu.illinois.cs.cs124.ay2024.mp.activities.RSOActivity;
 import edu.illinois.cs.cs124.ay2024.mp.models.RSO;
 import edu.illinois.cs.cs124.ay2024.mp.models.RSOData;
 import edu.illinois.cs.cs124.ay2024.mp.models.Summary;
@@ -275,7 +276,7 @@ public final class MP2Test {
       Summary summary = trimmedSummaries.get(i);
 
       // Create the Intent
-      Intent intent = new Intent(ApplicationProvider.getApplicationContext(), edu.illinois.cs.cs124.ay2024.mp.test.RSOActivity.class);
+      Intent intent = new Intent(ApplicationProvider.getApplicationContext(), RSOActivity.class);
       intent.putExtra("id", summary.getId());
 
       // Use the Client to retrieve the RSO details

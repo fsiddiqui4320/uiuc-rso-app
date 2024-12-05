@@ -8,12 +8,15 @@ import androidx.annotation.NonNull;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import edu.illinois.cs.cs124.ay2024.mp.application.JoinableApplication;
+import edu.illinois.cs.cs124.ay2024.mp.models.RSO;
 import edu.illinois.cs.cs124.ay2024.mp.models.RSOData;
 import edu.illinois.cs.cs124.ay2024.mp.models.Summary;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -41,6 +44,11 @@ public final class Server extends Dispatcher {
   /** List of RSO summaries. Populated during startup. */
   private final List<Summary> summaries = new ArrayList<>();
 
+  /** Map of IDs to RSOs. Populated during startup. */
+  private static final Map<String, RSO> idToRSO = new HashMap<>();
+
+  public static Map<String, RSO> getIdToRSO() { return idToRSO; }
+
   /** Helper method to create a 200 HTTP response with a body. */
   private MockResponse makeOKJSONResponse(@NonNull String body) {
     return new MockResponse()
@@ -64,6 +72,25 @@ public final class Server extends Dispatcher {
   /** GET the list of RSO summaries. */
   private MockResponse getSummaries() throws JsonProcessingException {
     return makeOKJSONResponse(OBJECT_MAPPER.writeValueAsString(summaries));
+  }
+
+  private MockResponse getRSO(String path) throws JsonProcessingException {
+    //logger.log(Level.WARNING, "Received request for RSO details for path: " + path);
+    // Retrieve the RSO id from the path
+    if (path.startsWith("/rsos")) {
+      return HTTP_NOT_FOUND;
+    }
+    String id = path.split("/")[2];
+    // Look up the RSO object by id (in data structure initialized in loadData)
+    RSO rso;
+    if (!idToRSO.containsKey(id)) {
+      return HTTP_NOT_FOUND;
+    } else {
+      rso = idToRSO.get(id);
+    }
+    // What happens if RSO object doesn't exist?
+    // return the serialized RSO object to the client
+    return makeOKJSONResponse(OBJECT_MAPPER.writeValueAsString(rso));
   }
 
   /**
@@ -94,6 +121,8 @@ public final class Server extends Dispatcher {
         return makeOKJSONResponse("200: OK");
       } else if (path.equals("/summary") && method.equals("GET")) {
         return getSummaries();
+      } else if (path.startsWith("/rso") && method.equals("GET")){
+        return getRSO(path);
       } else {
         // Default is not found
         logger.log(Level.WARNING, "Route not found: " + path);
@@ -106,10 +135,6 @@ public final class Server extends Dispatcher {
           .setBody("500: Internal Error");
     }
   }
-
-  /////////////////////////////////////////////////////////////////////////////////////////////////
-  // YOU SHOULD NOT NEED TO MODIFY THE CODE BELOW
-  /////////////////////////////////////////////////////////////////////////////////////////////////
 
   /** Start the server if has not already been started, and wait for startup to finish. */
   public static void start() {
@@ -214,7 +239,6 @@ public final class Server extends Dispatcher {
 
     // Load the JSON string
     String json = readRSODataFile();
-
     // Build the list of summaries
     try {
       // Iterate through the list of JsonNodes returned by deserialization
@@ -223,7 +247,7 @@ public final class Server extends Dispatcher {
         // Load the RSOData object, use it to initialize the Summary and RSO objects, and then
         // add them to the appropriate collections.
         RSOData rsoData = OBJECT_MAPPER.readValue(node.toString(), RSOData.class);
-
+        idToRSO.put(rsoData.id(), new RSO(rsoData));
         Summary summary = new Summary(rsoData);
         summaries.add(summary);
       }

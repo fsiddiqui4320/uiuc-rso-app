@@ -72,6 +72,7 @@ public class Summary implements Comparable<Summary> {
     id = rsoData.id();
     title = rsoData.title();
 
+
     String[] categoryParts = rsoData.categories().split("-");
     if (categoryParts.length == 0) {
       throw new IllegalStateException("Color not set for RSO");
@@ -183,18 +184,5 @@ public class Summary implements Comparable<Summary> {
       }
     }
     return result;
-//    while (!map.isEmpty()) {
-//      Summary max = null;
-//
-//      int maxCount = (Collections.max(map.values()));
-//      for (Map.Entry<Summary, Integer> entry : map.entrySet()) {
-//        if (entry.getValue() == maxCount) {
-//          max = entry.getKey();
-//        }
-//        result.add(max);
-//        map.remove(max);
-//      }
-//    }
-//    return result;
   }
 }
