@@ -1,6 +1,5 @@
 package edu.illinois.cs.cs124.ay2024.mp.activities;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;

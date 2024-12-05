@@ -45,9 +45,11 @@ public final class Server extends Dispatcher {
   private final List<Summary> summaries = new ArrayList<>();
 
   /** Map of IDs to RSOs. Populated during startup. */
-  private static final Map<String, RSO> idToRSO = new HashMap<>();
+  private static final Map<String, RSO> ID_TO_RSO = new HashMap<>();
 
-  public static Map<String, RSO> getIdToRSO() { return idToRSO; }
+  public static Map<String, RSO> getIdToRSO() {
+    return ID_TO_RSO;
+  }
 
   /** Helper method to create a 200 HTTP response with a body. */
   private MockResponse makeOKJSONResponse(@NonNull String body) {
@@ -83,10 +85,10 @@ public final class Server extends Dispatcher {
     String id = path.split("/")[2];
     // Look up the RSO object by id (in data structure initialized in loadData)
     RSO rso;
-    if (!idToRSO.containsKey(id)) {
+    if (!ID_TO_RSO.containsKey(id)) {
       return HTTP_NOT_FOUND;
     } else {
-      rso = idToRSO.get(id);
+      rso = ID_TO_RSO.get(id);
     }
     // What happens if RSO object doesn't exist?
     // return the serialized RSO object to the client
@@ -247,7 +249,7 @@ public final class Server extends Dispatcher {
         // Load the RSOData object, use it to initialize the Summary and RSO objects, and then
         // add them to the appropriate collections.
         RSOData rsoData = OBJECT_MAPPER.readValue(node.toString(), RSOData.class);
-        idToRSO.put(rsoData.id(), new RSO(rsoData));
+        ID_TO_RSO.put(rsoData.id(), new RSO(rsoData));
         Summary summary = new Summary(rsoData);
         summaries.add(summary);
       }
