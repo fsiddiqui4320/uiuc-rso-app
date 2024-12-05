@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class RSO extends Summary {
@@ -60,5 +61,9 @@ public class RSO extends Summary {
     mission = rsoData.mission();
     website = rsoData.website();
     categories = setCategories;
+  }
+
+  @NonNull List<Summary> getRelatedRSOs() {
+    return Collections.emptyList();
   }
 }

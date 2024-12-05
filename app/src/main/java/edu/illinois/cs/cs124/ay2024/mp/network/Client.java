@@ -84,6 +84,14 @@ public final class Client {
     requestQueue.add(summariesRequest);
   }
 
+  public void getFavorite(@NonNull final String id, (@NonNull final Consumer<ResultMightThrow<List<Boolean>>> callback) {
+    throw new IllegalStateException("Unimplemented");
+  }
+
+  public void setFavorite(@NonNull final String id, final boolean isFavorite, (@NonNull final Consumer<ResultMightThrow<List<Boolean>>> callback) {
+    throw new IllegalStateException("Unimplemented");
+  }
+
   /////////////////////////////////////////////////////////////////////////////////////////////////
   // YOU SHOULD NOT NEED TO MODIFY THE CODE BELOW
   /////////////////////////////////////////////////////////////////////////////////////////////////
