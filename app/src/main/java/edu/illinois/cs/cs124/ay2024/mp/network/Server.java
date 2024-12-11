@@ -14,6 +14,7 @@ import edu.illinois.cs.cs124.ay2024.mp.models.Summary;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +28,7 @@ import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
+import edu.illinois.cs.cs124.ay2024.mp.models.Favorite;
 
 /**
  * Development RSO API server.
@@ -51,6 +53,10 @@ public final class Server extends Dispatcher {
     return ID_TO_RSO;
   }
 
+  private final Map<String, Boolean> favoriteMap = new HashMap<>();
+
+  private final List<String> favorites = new ArrayList<>();
+
   /** Helper method to create a 200 HTTP response with a body. */
   private MockResponse makeOKJSONResponse(@NonNull String body) {
     return new MockResponse()
@@ -73,7 +79,17 @@ public final class Server extends Dispatcher {
 
   /** GET the list of RSO summaries. */
   private MockResponse getSummaries() throws JsonProcessingException {
-    return makeOKJSONResponse(OBJECT_MAPPER.writeValueAsString(summaries));
+    List<Summary> newSummaries = new ArrayList<>();
+    List<Summary> tempSummaries = summaries;
+    for (String id : favoriteMap.keySet()) {
+      RSO rso = ID_TO_RSO.get(id);
+      newSummaries.add(rso);
+      tempSummaries.remove(rso);
+    }
+    Collections.sort(newSummaries);
+    Collections.sort(tempSummaries);
+    newSummaries.addAll(tempSummaries);
+    return makeOKJSONResponse(OBJECT_MAPPER.writeValueAsString(newSummaries));
   }
 
   private MockResponse getRSO(String path) throws JsonProcessingException {
@@ -93,6 +109,21 @@ public final class Server extends Dispatcher {
     // What happens if RSO object doesn't exist?
     // return the serialized RSO object to the client
     return makeOKJSONResponse(OBJECT_MAPPER.writeValueAsString(rso));
+  }
+
+  private MockResponse getFavorite(String id) throws JsonProcessingException {
+    if (!getIdToRSO().containsKey(id)) {
+      return HTTP_NOT_FOUND;
+    }
+
+    // If the ID is not present in favoriteMap, default to false (not a favorite)
+    boolean isFavorite = favoriteMap.getOrDefault(id, false);
+
+    // Create a Favorite object for the response
+    Favorite favorite = new Favorite(id, isFavorite);
+
+    // Serialize the Favorite object to JSON and return a 200 OK response
+    return makeOKJSONResponse(OBJECT_MAPPER.writeValueAsString(favorite));
   }
 
   /**
@@ -119,12 +150,53 @@ public final class Server extends Dispatcher {
         // Used by API client to validate server after startup
         return makeOKJSONResponse(CHECK_SERVER_RESPONSE);
       } else if (path.equals("/reset") && method.equals("GET")) {
+        favoriteMap.clear();
         // Used to reset the server during testing
         return makeOKJSONResponse("200: OK");
       } else if (path.equals("/summary") && method.equals("GET")) {
         return getSummaries();
       } else if (path.startsWith("/rso") && method.equals("GET")) {
         return getRSO(path);
+      } else if (path.equals("/favorite") && method.equals("POST")) {
+        // Handle POST /favorite
+        // We must read the request body JSON once
+        String body = request.getBody().readUtf8();
+        if (body == null || body.isEmpty()) {
+          return HTTP_BAD_REQUEST;
+        }
+        try {
+          Favorite favorite = OBJECT_MAPPER.readValue(body, Favorite.class);
+          // Update our favorite map
+          favoriteMap.put(favorite.getId(), favorite.getFavorite());
+          // Return a redirect (302 Found) to /favorite/RSOID
+          return new MockResponse()
+              .setResponseCode(HttpURLConnection.HTTP_MOVED_TEMP)
+              .setHeader("Location", "/favorite/" + favorite.getId());
+        } catch (Exception e) {
+          return HTTP_BAD_REQUEST;
+        }
+      } else if (path.startsWith("/favorite/") && method.equals("GET")) {
+        // Handle GET /favorite/RSOID
+        String[] parts = path.split("/");
+        if (parts.length != 3) {
+          return HTTP_BAD_REQUEST;
+        }
+        String rsoID = parts[2];
+        if (!getIdToRSO().containsKey(rsoID)) {
+          return HTTP_NOT_FOUND;
+        }
+        boolean isFavorite = favoriteMap.getOrDefault(rsoID, false);
+        try {
+          Favorite favorite = new Favorite(rsoID, isFavorite);
+          return makeOKJSONResponse(OBJECT_MAPPER.writeValueAsString(favorite));
+        } catch (JsonProcessingException e) {
+          logger.log(Level.SEVERE, "Error serializing favorite JSON", e);
+          return HTTP_BAD_REQUEST;
+        }
+      } else if (path.equals("/reset")) {
+        // Clear the favorites map
+        favoriteMap.clear();
+        return makeOKJSONResponse("200: OK");
       } else {
         // Default is not found
         logger.log(Level.WARNING, "Route not found: " + path);
@@ -249,7 +321,9 @@ public final class Server extends Dispatcher {
         // Load the RSOData object, use it to initialize the Summary and RSO objects, and then
         // add them to the appropriate collections.
         RSOData rsoData = OBJECT_MAPPER.readValue(node.toString(), RSOData.class);
-        ID_TO_RSO.put(rsoData.id(), new RSO(rsoData));
+        String id = rsoData.id();
+        ID_TO_RSO.put(id, new RSO(rsoData));
+        favoriteMap.put(id, false);
         Summary summary = new Summary(rsoData);
         summaries.add(summary);
       }

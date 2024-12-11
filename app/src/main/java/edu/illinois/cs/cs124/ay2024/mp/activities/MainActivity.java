@@ -33,9 +33,13 @@ public final class MainActivity extends Activity implements SearchView.OnQueryTe
   /** Tag to identify the MainActivity in the logs. */
   private static final String TAG = MainActivity.class.getSimpleName();
 
+
   /** List of RSO summaries received from the server, initially empty. */
   private List<Summary> summaries = Collections.emptyList();
 
+  public void setSummaries(List<Summary> summaries) {
+    this.summaries = summaries;
+  }
 
   /** Adapter that connects our list of summaries with the UI displayed to the user. */
   private SummaryListAdapter listAdapter;
@@ -128,7 +132,6 @@ public final class MainActivity extends Activity implements SearchView.OnQueryTe
                 Log.d(TAG, "Initial size: " + result.getValue().size());
                 summaries = filterColor(result.getValue(), shownColors);
                 Log.d(TAG, "Filtered size: " + summaries.size());
-                Collections.sort(summaries);
                 listAdapter.setSummaries(summaries);
               } catch (Exception e) {
                 Log.e(TAG, "Error updating summary list", e);

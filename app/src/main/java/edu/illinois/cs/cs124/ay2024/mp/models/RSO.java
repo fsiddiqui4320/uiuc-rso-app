@@ -63,7 +63,8 @@ public class RSO extends Summary {
     categories = setCategories;
   }
 
-  @NonNull List<Summary> getRelatedRSOs() {
+  @NonNull
+  public List<Summary> getRelatedRSOs() {
     return Collections.emptyList();
   }
 }

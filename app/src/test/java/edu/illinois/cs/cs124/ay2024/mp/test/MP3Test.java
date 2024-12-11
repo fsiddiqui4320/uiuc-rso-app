@@ -28,6 +28,7 @@ import static edu.illinois.cs.cs124.ay2024.mp.test.helpers.TestHelpers.trimmedMe
 import static edu.illinois.cs.cs124.ay2024.mp.test.helpers.Views.countRecyclerView;
 import static edu.illinois.cs.cs124.ay2024.mp.test.helpers.Views.isChecked;
 import static edu.illinois.cs.cs124.ay2024.mp.test.helpers.Views.setChecked;
+import static javolution.util.stripped.FastMap.logger;
 import static org.hamcrest.Matchers.containsString;
 
 import android.content.Intent;
@@ -58,6 +59,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
+import java.util.logging.Level;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -144,6 +146,8 @@ public final class MP3Test {
       // POST to change the favorite status accordingly
       Favorite favorite = testServerPost("/favorite", newFavorite, Favorite.class);
       // Ensure the result is what we expect
+      logger.log(Level.INFO, OBJECT_MAPPER.writeValueAsString(newFavorite));
+      logger.log(Level.INFO, OBJECT_MAPPER.writeValueAsString(favorite));
       assertWithMessage("Incorrect value from favorite POST")
           .that(favorite.getFavorite())
           .isEqualTo(isFavorite);
@@ -209,6 +213,13 @@ public final class MP3Test {
     testServerPost("/favorite", badBody, HttpURLConnection.HTTP_BAD_REQUEST);
   }
 
+//  @Test
+//  public void testPOSTRequest() throws Exception {
+//    Client apiClient = getAPIClient();
+//    Boolean unused =
+//        testClient(
+//            (callback) -> apiClient.setFavorite("Hello World!", true, callback));
+//  }
   // Test the client getFavorite and setFavorite methods
   @Test(timeout = 30000L)
   @Graded(points = 20, friendlyName = "Client getFavorite and setFavorite (Integration)")

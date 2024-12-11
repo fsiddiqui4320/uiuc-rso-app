@@ -6,6 +6,7 @@ import static edu.illinois.cs.cs124.ay2024.mp.helpers.Helpers.OBJECT_MAPPER;
 import android.os.Build;
 import android.util.Log;
 import androidx.annotation.NonNull;
+import com.android.volley.AuthFailureError;
 import com.android.volley.Cache;
 import com.android.volley.ExecutorDelivery;
 import com.android.volley.Network;
@@ -18,8 +19,10 @@ import com.android.volley.toolbox.NoCache;
 import com.android.volley.toolbox.StringRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import junit.framework.Test;
 import edu.illinois.cs.cs124.ay2024.mp.application.JoinableApplication;
 import edu.illinois.cs.cs124.ay2024.mp.helpers.ResultMightThrow;
+import edu.illinois.cs.cs124.ay2024.mp.models.Favorite;
 import edu.illinois.cs.cs124.ay2024.mp.models.RSO;
 import edu.illinois.cs.cs124.ay2024.mp.models.Summary;
 import java.io.BufferedReader;
@@ -27,11 +30,14 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -41,6 +47,8 @@ import java.util.stream.Collectors;
  */
 public final class Client {
   private static final String TAG = Client.class.getSimpleName();
+
+  private final Logger logger = Logger.getLogger(Server.class.getName());
 
   public void getRSO(@NonNull String id, @NonNull final Consumer<ResultMightThrow<RSO>> callback) {
     StringRequest rsoRequest =
@@ -84,12 +92,63 @@ public final class Client {
     requestQueue.add(summariesRequest);
   }
 
-  public void getFavorite(@NonNull final String id, (@NonNull final Consumer<ResultMightThrow<List<Boolean>>> callback) {
-    throw new IllegalStateException("Unimplemented");
+  public void getFavorite(@NonNull final String id, @NonNull final Consumer<ResultMightThrow<Boolean>> callback) {
+    StringRequest getFavoriteRequest =
+        new StringRequest(
+            Request.Method.GET,
+            JoinableApplication.SERVER_URL + "/favorite/" + id,
+            response -> {
+              try {
+                Favorite favorite = OBJECT_MAPPER.readValue(response, Favorite.class);
+                callback.accept(new ResultMightThrow<>(favorite.getFavorite()));
+              } catch (JsonProcessingException e) {
+                callback.accept(new ResultMightThrow<>(e));
+              }
+            },
+            error -> callback.accept(new ResultMightThrow<>(error)));
+    requestQueue.add(getFavoriteRequest);
   }
 
-  public void setFavorite(@NonNull final String id, final boolean isFavorite, (@NonNull final Consumer<ResultMightThrow<List<Boolean>>> callback) {
-    throw new IllegalStateException("Unimplemented");
+  public void setFavorite(@NonNull final String id, final boolean isFavorite, @NonNull final Consumer<ResultMightThrow<Boolean>> callback) {
+    // Create the Favorite object
+    Favorite favorite = new Favorite(id, isFavorite);
+    String favoriteJSON;
+    try {
+      favoriteJSON = OBJECT_MAPPER.writeValueAsString(favorite);
+    } catch (JsonProcessingException e) {
+      callback.accept(new ResultMightThrow<>(e));
+      return;
+    }
+
+    StringRequest setFavoriteRequest =
+        new StringRequest(
+            Request.Method.POST,
+            JoinableApplication.SERVER_URL + "/favorite",
+            response -> {
+              // The server responds with a redirect to /favorite/RSOID followed by a GET response.
+              // Since HttpURLConnection.setFollowRedirects(true) is called, Volley should follow the redirect
+              // and 'response' should end up being the final GET response body.
+
+              // At this point, response should contain the JSON of the favorite after redirect.
+              try {
+                Favorite returnedFavorite = OBJECT_MAPPER.readValue(response, Favorite.class);
+                callback.accept(new ResultMightThrow<>(returnedFavorite.getFavorite()));
+              } catch (JsonProcessingException e) {
+                callback.accept(new ResultMightThrow<>(e));
+              }
+            },
+            error -> callback.accept(new ResultMightThrow<>(error))) {
+          @Override
+          public String getBodyContentType() {
+            return "application/json; charset=utf-8";
+          }
+
+          @Override
+          public byte[] getBody() throws AuthFailureError {
+            return favoriteJSON.getBytes(StandardCharsets.UTF_8);
+          }
+        };
+    requestQueue.add(setFavoriteRequest);
   }
 
   /////////////////////////////////////////////////////////////////////////////////////////////////

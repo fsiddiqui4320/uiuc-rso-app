@@ -1,7 +1,9 @@
 package edu.illinois.cs.cs124.ay2024.mp.models;
 
+import static edu.illinois.cs.cs124.ay2024.mp.helpers.Helpers.OBJECT_MAPPER;
 import androidx.annotation.NonNull;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import java.net.CookieHandler;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -12,6 +14,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.LinkedHashMap;
+import edu.illinois.cs.cs124.ay2024.mp.application.JoinableApplication;
+import edu.illinois.cs.cs124.ay2024.mp.network.Server;
 
 
 /**
@@ -39,6 +43,8 @@ public class Summary implements Comparable<Summary> {
   public final String getTitle() {
     return title;
   }
+
+
 
 
 
@@ -137,6 +143,22 @@ public class Summary implements Comparable<Summary> {
     }
     return inputlist;
   }
+
+/*  public static List<Summary> sortByFavorite(List<Summary> inputlist, Map<String, Boolean> favoriteMap) {
+    JoinableApplication application = (JoinableApplication) getApplication();
+
+    Collections.sort(inputlist);
+    List<Summary> newSummaries = new ArrayList<>();
+    for (String id : favoriteMap.keySet()) {
+      RSO rso = ID_TO_RSO.get(id);
+      newSummaries.add(rso);
+      inputlist.remove(rso);
+    }
+    Collections.sort(newSummaries);
+    Collections.sort(inputlist);
+    newSummaries.addAll(inputlist);
+    return newSummaries;
+  }*/
 
   public static List<Summary> search(List<Summary> inputlist, String search) {
     List<Summary> result = new ArrayList<>();
