@@ -92,7 +92,8 @@ public final class Client {
     requestQueue.add(summariesRequest);
   }
 
-  public void getFavorite(@NonNull final String id, @NonNull final Consumer<ResultMightThrow<Boolean>> callback) {
+  public void getFavorite(@NonNull final String id,
+                          @NonNull final Consumer<ResultMightThrow<Boolean>> callback) {
     StringRequest getFavoriteRequest =
         new StringRequest(
             Request.Method.GET,
@@ -109,7 +110,8 @@ public final class Client {
     requestQueue.add(getFavoriteRequest);
   }
 
-  public void setFavorite(@NonNull final String id, final boolean isFavorite, @NonNull final Consumer<ResultMightThrow<Boolean>> callback) {
+  public void setFavorite(@NonNull final String id, final boolean isFavorite,
+                          @NonNull final Consumer<ResultMightThrow<Boolean>> callback) {
     // Create the Favorite object
     Favorite favorite = new Favorite(id, isFavorite);
     String favoriteJSON;
@@ -126,7 +128,8 @@ public final class Client {
             JoinableApplication.SERVER_URL + "/favorite",
             response -> {
               // The server responds with a redirect to /favorite/RSOID followed by a GET response.
-              // Since HttpURLConnection.setFollowRedirects(true) is called, Volley should follow the redirect
+              // Since HttpURLConnection.setFollowRedirects(true) is called, Volley should follow
+              // the redirect
               // and 'response' should end up being the final GET response body.
 
               // At this point, response should contain the JSON of the favorite after redirect.
@@ -216,7 +219,8 @@ public final class Client {
     if (testing) {
       requestQueue =
           new RequestQueue(
-              cache, network, 1, new ExecutorDelivery(Executors.newSingleThreadExecutor()));
+              cache, network, 1,
+              new ExecutorDelivery(Executors.newSingleThreadExecutor()));
     } else {
       requestQueue = new RequestQueue(cache, network);
     }

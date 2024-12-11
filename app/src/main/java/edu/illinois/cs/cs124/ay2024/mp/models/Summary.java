@@ -14,8 +14,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.LinkedHashMap;
-import edu.illinois.cs.cs124.ay2024.mp.application.JoinableApplication;
-import edu.illinois.cs.cs124.ay2024.mp.network.Server;
 
 
 /**
@@ -141,7 +139,8 @@ public class Summary implements Comparable<Summary> {
     return filtered;
   }
 
-/*  public static List<Summary> sortByFavorite(List<Summary> inputlist, Map<String, Boolean> favoriteMap) {
+/*  public static List<Summary> sortByFavorite(List<Summary> inputlist,
+Map<String, Boolean> favoriteMap) {
     JoinableApplication application = (JoinableApplication) getApplication();
 
     Collections.sort(inputlist);

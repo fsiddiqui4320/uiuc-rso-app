@@ -1,9 +1,6 @@
 package edu.illinois.cs.cs124.ay2024.mp.models;
 
-import static edu.illinois.cs.cs124.ay2024.mp.helpers.Helpers.OBJECT_MAPPER;
 import androidx.annotation.NonNull;
-import java.net.HttpURLConnection;
-import java.util.logging.Level;
 
 public class Favorite {
 

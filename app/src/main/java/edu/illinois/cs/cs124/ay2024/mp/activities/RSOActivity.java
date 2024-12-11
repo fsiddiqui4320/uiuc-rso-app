@@ -2,7 +2,6 @@ package edu.illinois.cs.cs124.ay2024.mp.activities;
 
 import static org.junit.Assert.assertNotNull;
 import static edu.illinois.cs.cs124.ay2024.mp.models.Summary.filterColor;
-//import static edu.illinois.cs.cs124.ay2024.mp.models.Summary.sortByFavorite;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -122,7 +121,8 @@ public class RSOActivity extends Activity {
     });
   }
 
-  private final CompoundButton.OnCheckedChangeListener favoriteButtonListener = (unused, checked) -> {
+  private final CompoundButton.OnCheckedChangeListener favoriteButtonListener =
+      (unused, checked) -> {
     Log.d(TAG, "Favorite button checked " + checked);
     JoinableApplication application = (JoinableApplication) getApplication();
     Client client = application.getClient();

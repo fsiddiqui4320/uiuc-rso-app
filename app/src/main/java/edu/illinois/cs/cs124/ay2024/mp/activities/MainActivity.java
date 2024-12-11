@@ -37,9 +37,6 @@ public final class MainActivity extends Activity implements SearchView.OnQueryTe
   /** List of RSO summaries received from the server, initially empty. */
   private List<Summary> summaries = Collections.emptyList();
 
-  public void setSummaries(List<Summary> summaries) {
-    this.summaries = summaries;
-  }
 
   /** Adapter that connects our list of summaries with the UI displayed to the user. */
   private SummaryListAdapter listAdapter;
