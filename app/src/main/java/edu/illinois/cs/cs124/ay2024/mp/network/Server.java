@@ -89,6 +89,7 @@ public final class Server extends Dispatcher {
     Collections.sort(newSummaries);
     Collections.sort(tempSummaries);
     newSummaries.addAll(tempSummaries);
+    logger.log(Level.INFO, OBJECT_MAPPER.writeValueAsString(newSummaries.size()));
     return makeOKJSONResponse(OBJECT_MAPPER.writeValueAsString(newSummaries));
   }
 

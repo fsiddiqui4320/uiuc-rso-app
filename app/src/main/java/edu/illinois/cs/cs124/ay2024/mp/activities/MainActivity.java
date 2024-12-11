@@ -87,32 +87,26 @@ public final class MainActivity extends Activity implements SearchView.OnQueryTe
   ));
 
   private final CompoundButton.OnCheckedChangeListener orangeButtonListener = (unused, checked) -> {
-    Log.d(TAG, "Orange button checked " + checked);
     if (checked) {
       shownColors.add(Summary.Color.ORANGE);
-      onStart();
     } else {
       shownColors.remove(Summary.Color.ORANGE);
     }
     List<Summary> filteredSummaries = filterColor(summaries, shownColors);
     listAdapter.setSummaries(filteredSummaries);
     listAdapter.notifyDataSetChanged();
-    onStart();
-    Log.d(TAG, "Currently shown colors: " + shownColors);
   };
 
   private final CompoundButton.OnCheckedChangeListener blueButtonListener = (unused, checked) -> {
     Log.d(TAG, "Blue button checked " + checked);
     if (checked) {
       shownColors.add(Summary.Color.BLUE);
-      onStart();
     } else {
       shownColors.remove(Summary.Color.BLUE);
     }
     List<Summary> filteredSummaries = filterColor(summaries, shownColors);
     listAdapter.setSummaries(filteredSummaries);
     listAdapter.notifyDataSetChanged();
-    onStart();
     Log.d(TAG, "Currently shown colors: " + shownColors);
   };
 
@@ -121,22 +115,19 @@ public final class MainActivity extends Activity implements SearchView.OnQueryTe
   protected void onStart() {
     super.onStart();
 
-    // Initiate a request for the summary list
     JoinableApplication application = (JoinableApplication) getApplication();
-    application
-        .getClient()
-        .getSummaries(
-            (result) -> {
-              // Update the list shown to the user in a callback
-              try {
-                Log.d(TAG, "Initial size: " + result.getValue().size());
-                summaries = filterColor(result.getValue(), shownColors);
-                Log.d(TAG, "Filtered size: " + summaries.size());
-                listAdapter.setSummaries(summaries);
-              } catch (Exception e) {
-                Log.e(TAG, "Error updating summary list", e);
-              }
-            });
+    application.getClient().getSummaries(
+        (result) -> {
+          try {
+            // Just set summaries directly without filtering
+            summaries = result.getValue();
+            Collections.sort(summaries); // If needed
+            listAdapter.setSummaries(summaries);
+            listAdapter.notifyDataSetChanged();
+          } catch (Exception e) {
+            Log.e(TAG, "Error updating summary list", e);
+          }
+        });
   }
 
   /**

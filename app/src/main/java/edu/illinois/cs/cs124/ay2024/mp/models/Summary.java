@@ -134,14 +134,11 @@ public class Summary implements Comparable<Summary> {
   }
 
   public static List<Summary> filterColor(List<Summary> inputlist, Set<Color> colors) {
-    Collections.sort(inputlist);
-    for (int i = inputlist.size() - 1; i >= 0; i--) {
-      Summary summary = inputlist.get(i);
-      if (!colors.contains(summary.color)) {
-        inputlist.remove(summary);
-      }
-    }
-    return inputlist;
+    // Create a copy so we don't modify the original list
+    List<Summary> filtered = new ArrayList<>(inputlist);
+    Collections.sort(filtered);
+    filtered.removeIf(summary -> !colors.contains(summary.getColor()));
+    return filtered;
   }
 
 /*  public static List<Summary> sortByFavorite(List<Summary> inputlist, Map<String, Boolean> favoriteMap) {

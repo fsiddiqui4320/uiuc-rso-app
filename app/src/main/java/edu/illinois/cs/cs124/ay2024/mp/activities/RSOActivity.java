@@ -128,8 +128,10 @@ public class RSOActivity extends Activity {
     Client client = application.getClient();
     // Set the favorite status for the current RSO based on the button state
     client.setFavorite(rsoId, checked, result -> {
+      // Update done, now go back to MainActivity
       runOnUiThread(() -> {
         listAdapter.notifyDataSetChanged();
+        finish(); // This closes RSOActivity and returns to MainActivity
       });
       Log.d(TAG, "Favorite status set to: " + checked);
     });
