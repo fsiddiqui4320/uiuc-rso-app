@@ -9,6 +9,7 @@
 
 plugins {
     id("com.android.application") version "8.7.1" apply false
+    id("org.jetbrains.kotlin.android") version "2.0.21" apply false
     id("com.diffplug.spotless") version "6.25.0"
     java
 }
@@ -21,6 +22,10 @@ spotless {
     java {
         googleJavaFormat("1.24.0")
         target("app/src/*/java/**/*.java")
+    }
+    kotlin {
+        ktlint("1.3.1")
+        target("app/src/*/java/**/*.kt")
     }
     kotlinGradle {
         ktlint("1.3.1")
