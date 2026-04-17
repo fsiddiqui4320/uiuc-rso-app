@@ -1,4 +1,4 @@
-# Joinable
+# Illini Orgs
 
 An Android app for browsing and favoriting Registered Student Organizations (RSOs) at the University of Illinois Urbana-Champaign. Built in Kotlin with Material Design 3.
 
