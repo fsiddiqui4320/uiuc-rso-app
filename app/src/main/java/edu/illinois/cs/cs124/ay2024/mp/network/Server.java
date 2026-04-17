@@ -79,18 +79,24 @@ public final class Server extends Dispatcher {
 
   /** GET the list of RSO summaries. */
   private MockResponse getSummaries() throws JsonProcessingException {
-    List<Summary> newSummaries = new ArrayList<>();
-    List<Summary> tempSummaries = summaries;
-    for (String id : favoriteMap.keySet()) {
-      RSO rso = ID_TO_RSO.get(id);
-      newSummaries.add(rso);
-      tempSummaries.remove(rso);
+    List<Summary> favorites = new ArrayList<>();
+    List<Summary> notFavorites = new ArrayList<>();
+    for (Summary summary : summaries) {
+      try {
+        if (favoriteMap.get(summary.getId())) {
+          favorites.add(summary);
+        } else {
+          notFavorites.add(summary);
+        }
+      } catch (Exception e) {
+        return HTTP_BAD_REQUEST;
+      }
     }
-    Collections.sort(newSummaries);
-    Collections.sort(tempSummaries);
-    newSummaries.addAll(tempSummaries);
-    logger.log(Level.INFO, OBJECT_MAPPER.writeValueAsString(newSummaries.size()));
-    return makeOKJSONResponse(OBJECT_MAPPER.writeValueAsString(newSummaries));
+    favorites.sort(Summary::compareTo);
+    notFavorites.sort(Summary::compareTo);
+    favorites.addAll(notFavorites);
+    logger.log(Level.INFO, OBJECT_MAPPER.writeValueAsString(favorites.size()));
+    return makeOKJSONResponse(OBJECT_MAPPER.writeValueAsString(favorites));
   }
 
   private MockResponse getRSO(String path) throws JsonProcessingException {
