@@ -6,7 +6,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
-        android:name="edu.illinois.cs.cs124.ay2024.mp.application.JoinableApplication"
+        android:name="com.fsiddiqui.joinable.application.JoinableApplication"
         android:allowBackup="false"
         android:fullBackupContent="false"
         android:icon="@mipmap/ic_launcher"

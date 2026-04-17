@@ -14,11 +14,11 @@ plugins {
     checkstyle
 }
 android {
-    namespace = "edu.illinois.cs.cs124.ay2024.mp"
+    namespace = "com.fsiddiqui.joinable"
     compileSdk = 34
     buildToolsVersion = "34.0.0"
     defaultConfig {
-        applicationId = "edu.illinois.cs.cs124.ay2024.joinable"
+        applicationId = "com.fsiddiqui.joinable"
         minSdk = 34
         targetSdk = 34
         versionCode = 1
