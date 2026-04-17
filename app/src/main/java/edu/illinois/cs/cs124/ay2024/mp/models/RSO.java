@@ -51,15 +51,15 @@ public class RSO extends Summary {
 
   public RSO(@NonNull RSOData rsoData) {
     super(rsoData);
-    String[] categoryParts = rsoData.categories().split("-");
+    String[] categoryParts = rsoData.getCategories().split("-");
     List<String> setCategories = new ArrayList<>();
     if (categoryParts.length > 1) {
       String[] cats = categoryParts[1].split(",");
       setCategories = new ArrayList<>(Arrays.asList(cats));
       setCategories.replaceAll(String::trim);
     }
-    mission = rsoData.mission();
-    website = rsoData.website();
+    mission = rsoData.getMission();
+    website = rsoData.getWebsite();
     categories = setCategories;
   }
 

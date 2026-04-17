@@ -73,11 +73,11 @@ public class Summary implements Comparable<Summary> {
    * @param rsoData the RSOData object to use to initialize this Summary
    */
   public Summary(@NonNull RSOData rsoData) {
-    id = rsoData.id();
-    title = rsoData.title();
+    id = rsoData.getId();
+    title = rsoData.getTitle();
 
 
-    String[] categoryParts = rsoData.categories().split("-");
+    String[] categoryParts = rsoData.getCategories().split("-");
     if (categoryParts.length == 0) {
       throw new IllegalStateException("Color not set for RSO");
     }

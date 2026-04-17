@@ -328,7 +328,7 @@ public final class Server extends Dispatcher {
         // Load the RSOData object, use it to initialize the Summary and RSO objects, and then
         // add them to the appropriate collections.
         RSOData rsoData = OBJECT_MAPPER.readValue(node.toString(), RSOData.class);
-        String id = rsoData.id();
+        String id = rsoData.getId();
         ID_TO_RSO.put(id, new RSO(rsoData));
         favoriteMap.put(id, false);
         Summary summary = new Summary(rsoData);
