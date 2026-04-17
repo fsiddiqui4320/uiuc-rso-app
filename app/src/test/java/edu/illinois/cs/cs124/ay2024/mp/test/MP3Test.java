@@ -213,13 +213,13 @@ public final class MP3Test {
     testServerPost("/favorite", badBody, HttpURLConnection.HTTP_BAD_REQUEST);
   }
 
-//  @Test
-//  public void testPOSTRequest() throws Exception {
-//    Client apiClient = getAPIClient();
-//    Boolean unused =
-//        testClient(
-//            (callback) -> apiClient.setFavorite("Hello World!", true, callback));
-//  }
+  //  @Test
+  //  public void testPOSTRequest() throws Exception {
+  //    Client apiClient = getAPIClient();
+  //    Boolean unused =
+  //        testClient(
+  //            (callback) -> apiClient.setFavorite("Hello World!", true, callback));
+  //  }
   // Test the client getFavorite and setFavorite methods
   @Test(timeout = 30000L)
   @Graded(points = 20, friendlyName = "Client getFavorite and setFavorite (Integration)")

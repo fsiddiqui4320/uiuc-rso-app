@@ -17,19 +17,24 @@ class SummaryListAdapter(
     private val activity: Activity,
     private val onClickCallback: Consumer<Summary>? = null,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-
     @SuppressLint("NotifyDataSetChanged")
     fun setSummaries(newSummaries: List<Summary>) {
         summaries = newSummaries
         activity.runOnUiThread { notifyDataSetChanged() }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): RecyclerView.ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_summary, parent, false)
         return object : RecyclerView.ViewHolder(view) {}
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: RecyclerView.ViewHolder,
+        position: Int,
+    ) {
         val summary = summaries[position]
         val title = holder.itemView.findViewById<TextView>(R.id.title)
         val subtitle = holder.itemView.findViewById<TextView>(R.id.subtitle)

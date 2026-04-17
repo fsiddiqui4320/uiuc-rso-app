@@ -3,7 +3,7 @@ package edu.illinois.cs.cs124.ay2024.mp.application
 import android.app.Application
 import android.os.Build
 import edu.illinois.cs.cs124.ay2024.mp.network.Client
-import edu.illinois.cs.cs124.ay2024.mp.network.Server
+import edu.illinois.cs.cs124.ay2024.mp.network.ServerBridge
 
 class JoinableApplication : Application() {
     private lateinit var client: Client
@@ -11,9 +11,9 @@ class JoinableApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         if (Build.FINGERPRINT == "robolectric") {
-            Server.start()
+            ServerBridge.start()
         } else {
-            Thread { Server.start() }.start()
+            Thread { ServerBridge.start() }.start()
         }
         client = Client.start()
     }

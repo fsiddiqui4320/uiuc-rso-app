@@ -32,10 +32,10 @@ class Server private constructor() : Dispatcher() {
             .setBody(body)
             .setHeader("Content-Type", "application/json; charset=utf-8")
 
-    private val HTTP_NOT_FOUND =
+    private val httpNotFound =
         MockResponse().setResponseCode(HttpURLConnection.HTTP_NOT_FOUND).setBody("404: Not Found")
 
-    private val HTTP_BAD_REQUEST =
+    private val httpBadRequest =
         MockResponse().setResponseCode(HttpURLConnection.HTTP_BAD_REQUEST).setBody("400: Bad Request")
 
     @Throws(JsonProcessingException::class)
@@ -44,10 +44,13 @@ class Server private constructor() : Dispatcher() {
         val notFavorites = mutableListOf<Summary>()
         for (summary in summaries) {
             try {
-                if (favoriteMap[summary.id] == true) favorites.add(summary)
-                else notFavorites.add(summary)
+                if (favoriteMap[summary.id] == true) {
+                    favorites.add(summary)
+                } else {
+                    notFavorites.add(summary)
+                }
             } catch (e: Exception) {
-                return HTTP_BAD_REQUEST
+                return httpBadRequest
             }
         }
         favorites.sort()
@@ -58,32 +61,35 @@ class Server private constructor() : Dispatcher() {
 
     @Throws(JsonProcessingException::class)
     private fun getRSO(path: String): MockResponse {
-        if (path.startsWith("/rsos")) return HTTP_NOT_FOUND
+        if (path.startsWith("/rsos")) return httpNotFound
         val id = path.split("/")[2]
-        val rso = ID_TO_RSO[id] ?: return HTTP_NOT_FOUND
+        val rso = ID_TO_RSO[id] ?: return httpNotFound
         return makeOKJSONResponse(OBJECT_MAPPER.writeValueAsString(rso))
     }
 
     @Throws(JsonProcessingException::class)
     private fun getFavoriteResponse(id: String): MockResponse {
-        if (!ID_TO_RSO.containsKey(id)) return HTTP_NOT_FOUND
+        if (!ID_TO_RSO.containsKey(id)) return httpNotFound
         val isFavorite = favoriteMap.getOrDefault(id, false)
         return makeOKJSONResponse(OBJECT_MAPPER.writeValueAsString(Favorite(id, isFavorite)))
     }
 
     override fun dispatch(request: RecordedRequest): MockResponse {
-        if (request.path == null || request.method == null) return HTTP_BAD_REQUEST
+        if (request.path == null || request.method == null) return httpBadRequest
         val path = request.path!!.replace(Regex("/+$"), "").replace(Regex("/+"), "/")
         val method = request.method!!.uppercase()
         return try {
             when {
                 path.isEmpty() && method == "GET" -> makeOKJSONResponse(CHECK_SERVER_RESPONSE)
-                path == "/reset" -> { favoriteMap.clear(); makeOKJSONResponse("200: OK") }
+                path == "/reset" -> {
+                    favoriteMap.clear()
+                    makeOKJSONResponse("200: OK")
+                }
                 path == "/summary" && method == "GET" -> getSummaries()
                 path.startsWith("/rso") && method == "GET" -> getRSO(path)
                 path == "/favorite" && method == "POST" -> {
                     val body = request.body.readUtf8()
-                    if (body.isEmpty()) return HTTP_BAD_REQUEST
+                    if (body.isEmpty()) return httpBadRequest
                     try {
                         val favorite = OBJECT_MAPPER.readValue(body, Favorite::class.java)
                         favoriteMap[favorite.id] = favorite.favorite
@@ -91,15 +97,18 @@ class Server private constructor() : Dispatcher() {
                             .setResponseCode(HttpURLConnection.HTTP_MOVED_TEMP)
                             .setHeader("Location", "/favorite/${favorite.id}")
                     } catch (e: Exception) {
-                        HTTP_BAD_REQUEST
+                        httpBadRequest
                     }
                 }
                 path.startsWith("/favorite/") && method == "GET" -> {
                     val parts = path.split("/")
-                    if (parts.size != 3) return HTTP_BAD_REQUEST
+                    if (parts.size != 3) return httpBadRequest
                     getFavoriteResponse(parts[2])
                 }
-                else -> { logger.log(Level.WARNING, "Route not found: $path"); HTTP_NOT_FOUND }
+                else -> {
+                    logger.log(Level.WARNING, "Route not found: $path")
+                    httpNotFound
+                }
             }
         } catch (e: Exception) {
             logger.log(Level.SEVERE, "Server internal error for path: $path", e)
@@ -116,6 +125,10 @@ class Server private constructor() : Dispatcher() {
                 ID_TO_RSO[rsoData.id] = RSO(rsoData)
                 favoriteMap[rsoData.id] = false
                 summaries.add(Summary(rsoData))
+            }
+            // After all RSOs are loaded, compute related RSOs for each
+            for (rso in ID_TO_RSO.values) {
+                rso.computeRelatedRSOs(ID_TO_RSO.values)
             }
         } catch (e: JsonProcessingException) {
             logger.log(Level.SEVERE, "Loading data failed", e)
@@ -136,7 +149,7 @@ class Server private constructor() : Dispatcher() {
         }
     }
 
-    companion object {
+    private companion object {
         private val ID_TO_RSO = HashMap<String, RSO>()
         private const val RETRY_COUNT = 8
         private const val RETRY_DELAY = 512L
@@ -153,20 +166,37 @@ class Server private constructor() : Dispatcher() {
         @JvmStatic fun isRunning(wait: Boolean): Boolean = isRunning(wait, RETRY_COUNT, RETRY_DELAY)
 
         @JvmStatic
-        fun isRunning(wait: Boolean, retryCount: Int, retryDelay: Long): Boolean {
+        fun isRunning(
+            wait: Boolean,
+            retryCount: Int,
+            retryDelay: Long,
+        ): Boolean {
             repeat(retryCount) {
                 val client = OkHttpClient()
-                val request = Request.Builder().url(JoinableApplication.SERVER_URL).get().build()
+                val request =
+                    Request
+                        .Builder()
+                        .url(JoinableApplication.SERVER_URL)
+                        .get()
+                        .build()
                 try {
                     client.newCall(request).execute().use { response ->
                         if (response.isSuccessful) {
-                            if (response.body!!.string() == CHECK_SERVER_RESPONSE) return true
-                            else throw IllegalStateException("Another server is running on port ${JoinableApplication.DEFAULT_SERVER_PORT}")
+                            if (response.body!!.string() == CHECK_SERVER_RESPONSE) {
+                                return true
+                            } else {
+                                throw IllegalStateException(
+                                    "Another server is running on port ${JoinableApplication.DEFAULT_SERVER_PORT}",
+                                )
+                            }
                         }
                     }
                 } catch (e: IOException) {
                     if (!wait) return false
-                    try { Thread.sleep(retryDelay) } catch (ignored: InterruptedException) {}
+                    try {
+                        Thread.sleep(retryDelay)
+                    } catch (ignored: InterruptedException) {
+                    }
                 }
             }
             return false
@@ -176,7 +206,12 @@ class Server private constructor() : Dispatcher() {
         @Throws(IOException::class)
         fun reset(): Boolean {
             val client = OkHttpClient()
-            val request = Request.Builder().url("${JoinableApplication.SERVER_URL}/reset/").get().build()
+            val request =
+                Request
+                    .Builder()
+                    .url("${JoinableApplication.SERVER_URL}/reset/")
+                    .get()
+                    .build()
             return client.newCall(request).execute().use { it.isSuccessful }
         }
     }

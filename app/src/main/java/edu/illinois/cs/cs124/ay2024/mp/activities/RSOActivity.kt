@@ -15,7 +15,7 @@ import edu.illinois.cs.cs124.ay2024.mp.models.RSO
 import edu.illinois.cs.cs124.ay2024.mp.models.Summary
 
 class RSOActivity : Activity() {
-    private val TAG = RSOActivity::class.java.simpleName
+    private val tag = RSOActivity::class.java.simpleName
     private lateinit var rsoId: String
     private lateinit var favoriteButton: TextView
     private var isFavorite = false
@@ -34,7 +34,7 @@ class RSOActivity : Activity() {
             updateFavoriteIcon()
             val client = (application as JoinableApplication).getClient()
             client.setFavorite(rsoId, isFavorite) { _ ->
-                Log.d(TAG, "Favorite set to $isFavorite")
+                Log.d(tag, "Favorite set to $isFavorite")
             }
         }
     }
@@ -48,7 +48,7 @@ class RSOActivity : Activity() {
                 val rso = result.getValue()
                 runOnUiThread { bindRso(rso) }
             } catch (e: Exception) {
-                Log.e(TAG, "Error loading RSO", e)
+                Log.e(tag, "Error loading RSO", e)
             }
         }
         client.getFavorite(rsoId) { result ->
@@ -56,7 +56,7 @@ class RSOActivity : Activity() {
                 isFavorite = result.getValue()
                 runOnUiThread { updateFavoriteIcon() }
             } catch (e: Exception) {
-                Log.e(TAG, "Error fetching favorite status", e)
+                Log.e(tag, "Error fetching favorite status", e)
             }
         }
     }
@@ -92,23 +92,28 @@ class RSOActivity : Activity() {
     private fun buildCategoryChip(text: String): TextView {
         val density = resources.displayMetrics.density
         val chip = TextView(this)
-        val params = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.WRAP_CONTENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT,
-        ).apply { marginEnd = (8 * density).toInt() }
+        val params =
+            LinearLayout
+                .LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                ).apply { marginEnd = (8 * density).toInt() }
         chip.layoutParams = params
         chip.text = text
         chip.setPadding(
-            (12 * density).toInt(), (4 * density).toInt(),
-            (12 * density).toInt(), (4 * density).toInt(),
+            (12 * density).toInt(),
+            (4 * density).toInt(),
+            (12 * density).toInt(),
+            (4 * density).toInt(),
         )
         chip.setTextColor(Color.WHITE)
         chip.textSize = 12f
-        chip.background = GradientDrawable().apply {
-            cornerRadius = 14 * density
-            setColor(Color.parseColor("#59E84A27"))
-            setStroke((1 * density).toInt(), Color.parseColor("#B3E84A27"))
-        }
+        chip.background =
+            GradientDrawable().apply {
+                cornerRadius = 14 * density
+                setColor(Color.parseColor("#59E84A27"))
+                setStroke((1 * density).toInt(), Color.parseColor("#B3E84A27"))
+            }
         return chip
     }
 }

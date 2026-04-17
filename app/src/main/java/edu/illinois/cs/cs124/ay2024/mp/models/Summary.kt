@@ -1,6 +1,7 @@
 package edu.illinois.cs.cs124.ay2024.mp.models
 
 import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonProperty
 
 open class Summary : Comparable<Summary> {
     val id: String
@@ -23,7 +24,11 @@ open class Summary : Comparable<Summary> {
     }
 
     @JsonCreator
-    constructor(setId: String, setTitle: String, setColor: Color) {
+    constructor(
+        @JsonProperty("id") setId: String,
+        @JsonProperty("title") setTitle: String,
+        @JsonProperty("color") setColor: Color,
+    ) {
         id = setId
         title = setTitle
         color = setColor
@@ -40,11 +45,16 @@ open class Summary : Comparable<Summary> {
 
     companion object {
         @JvmStatic
-        fun filterColor(inputList: List<Summary>, colors: Set<Color>): List<Summary> =
-            inputList.filter { it.color in colors }.sortedBy { it.title }
+        fun filterColor(
+            inputList: List<Summary>,
+            colors: Set<Color>,
+        ): List<Summary> = inputList.filter { it.color in colors }.sortedBy { it.title }
 
         @JvmStatic
-        fun search(inputList: List<Summary>, search: String): List<Summary> {
+        fun search(
+            inputList: List<Summary>,
+            search: String,
+        ): List<Summary> {
             val searchTerm = search.trim().lowercase()
             if (searchTerm.isEmpty()) return inputList.toList()
 

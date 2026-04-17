@@ -31,94 +31,113 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import java.util.function.Consumer
-import java.util.logging.Level
 import java.util.logging.Logger
 import java.util.stream.Collectors
 
 class Client private constructor() {
-    private val TAG = Client::class.java.simpleName
+    private val tag = Client::class.java.simpleName
     private val logger = Logger.getLogger(Server::class.java.name)
     private val requestQueue: RequestQueue
     private val connected = CompletableFuture<Boolean>()
 
     fun getConnected(): Boolean =
-        try { connected.get(GET_CONNECTED_DELAY_SEC, TimeUnit.SECONDS) } catch (e: Exception) { false }
+        try {
+            connected.get(GET_CONNECTED_DELAY_SEC, TimeUnit.SECONDS)
+        } catch (e: Exception) {
+            false
+        }
 
-    fun getRSO(id: String, callback: Consumer<ResultMightThrow<RSO>>) {
-        val rsoRequest = StringRequest(
-            Request.Method.GET,
-            JoinableApplication.SERVER_URL + "/rso/" + id,
-            { response ->
-                try {
-                    val rso = OBJECT_MAPPER.readValue(response, object : TypeReference<RSO>() {})
-                    callback.accept(ResultMightThrow(rso))
-                } catch (e: JsonProcessingException) {
-                    callback.accept(ResultMightThrow(e))
-                }
-            },
-            { error -> callback.accept(ResultMightThrow(error)) },
-        )
+    fun getRSO(
+        id: String,
+        callback: Consumer<ResultMightThrow<RSO>>,
+    ) {
+        val rsoRequest =
+            StringRequest(
+                Request.Method.GET,
+                JoinableApplication.SERVER_URL + "/rso/" + id,
+                { response ->
+                    try {
+                        val rso = OBJECT_MAPPER.readValue(response, object : TypeReference<RSO>() {})
+                        callback.accept(ResultMightThrow(rso))
+                    } catch (e: JsonProcessingException) {
+                        callback.accept(ResultMightThrow(e))
+                    }
+                },
+                { error -> callback.accept(ResultMightThrow(error)) },
+            )
         requestQueue.add(rsoRequest)
     }
 
     fun getSummaries(callback: Consumer<ResultMightThrow<List<Summary>>>) {
-        val summariesRequest = StringRequest(
-            Request.Method.GET,
-            JoinableApplication.SERVER_URL + "/summary/",
-            { response ->
-                try {
-                    val summaries = OBJECT_MAPPER.readValue(response, object : TypeReference<List<Summary>>() {})
-                    callback.accept(ResultMightThrow(summaries))
-                } catch (e: JsonProcessingException) {
-                    callback.accept(ResultMightThrow(e))
-                }
-            },
-            { error -> callback.accept(ResultMightThrow(error)) },
-        )
+        val summariesRequest =
+            StringRequest(
+                Request.Method.GET,
+                JoinableApplication.SERVER_URL + "/summary/",
+                { response ->
+                    try {
+                        val summaries = OBJECT_MAPPER.readValue(response, object : TypeReference<List<Summary>>() {})
+                        callback.accept(ResultMightThrow(summaries))
+                    } catch (e: JsonProcessingException) {
+                        callback.accept(ResultMightThrow(e))
+                    }
+                },
+                { error -> callback.accept(ResultMightThrow(error)) },
+            )
         requestQueue.add(summariesRequest)
     }
 
-    fun getFavorite(id: String, callback: Consumer<ResultMightThrow<Boolean>>) {
-        val request = StringRequest(
-            Request.Method.GET,
-            JoinableApplication.SERVER_URL + "/favorite/" + id,
-            { response ->
-                try {
-                    val favorite = OBJECT_MAPPER.readValue(response, Favorite::class.java)
-                    callback.accept(ResultMightThrow(favorite.favorite))
-                } catch (e: JsonProcessingException) {
-                    callback.accept(ResultMightThrow(e))
-                }
-            },
-            { error -> callback.accept(ResultMightThrow(error)) },
-        )
+    fun getFavorite(
+        id: String,
+        callback: Consumer<ResultMightThrow<Boolean>>,
+    ) {
+        val request =
+            StringRequest(
+                Request.Method.GET,
+                JoinableApplication.SERVER_URL + "/favorite/" + id,
+                { response ->
+                    try {
+                        val favorite = OBJECT_MAPPER.readValue(response, Favorite::class.java)
+                        callback.accept(ResultMightThrow(favorite.favorite))
+                    } catch (e: JsonProcessingException) {
+                        callback.accept(ResultMightThrow(e))
+                    }
+                },
+                { error -> callback.accept(ResultMightThrow(error)) },
+            )
         requestQueue.add(request)
     }
 
-    fun setFavorite(id: String, isFavorite: Boolean, callback: Consumer<ResultMightThrow<Boolean>>) {
-        val favoriteJSON = try {
-            OBJECT_MAPPER.writeValueAsString(Favorite(id, isFavorite))
-        } catch (e: JsonProcessingException) {
-            callback.accept(ResultMightThrow(e))
-            return
-        }
+    fun setFavorite(
+        id: String,
+        isFavorite: Boolean,
+        callback: Consumer<ResultMightThrow<Boolean>>,
+    ) {
+        val favoriteJSON =
+            try {
+                OBJECT_MAPPER.writeValueAsString(Favorite(id, isFavorite))
+            } catch (e: JsonProcessingException) {
+                callback.accept(ResultMightThrow(e))
+                return
+            }
 
-        val request = object : StringRequest(
-            Method.POST,
-            JoinableApplication.SERVER_URL + "/favorite",
-            { response ->
-                try {
-                    val returned = OBJECT_MAPPER.readValue(response, Favorite::class.java)
-                    callback.accept(ResultMightThrow(returned.favorite))
-                } catch (e: JsonProcessingException) {
-                    callback.accept(ResultMightThrow(e))
-                }
-            },
-            { error -> callback.accept(ResultMightThrow(error)) },
-        ) {
-            override fun getBodyContentType() = "application/json; charset=utf-8"
-            override fun getBody() = favoriteJSON.toByteArray(StandardCharsets.UTF_8)
-        }
+        val request =
+            object : StringRequest(
+                Method.POST,
+                JoinableApplication.SERVER_URL + "/favorite",
+                { response ->
+                    try {
+                        val returned = OBJECT_MAPPER.readValue(response, Favorite::class.java)
+                        callback.accept(ResultMightThrow(returned.favorite))
+                    } catch (e: JsonProcessingException) {
+                        callback.accept(ResultMightThrow(e))
+                    }
+                },
+                { error -> callback.accept(ResultMightThrow(error)) },
+            ) {
+                override fun getBodyContentType() = "application/json; charset=utf-8"
+
+                override fun getBody() = favoriteJSON.toByteArray(StandardCharsets.UTF_8)
+            }
         requestQueue.add(request)
     }
 
@@ -129,18 +148,20 @@ class Client private constructor() {
 
         val cache: Cache = NoCache()
         val network: Network = BasicNetwork(HurlStack())
-        requestQueue = if (testing) {
-            RequestQueue(cache, network, 1, ExecutorDelivery(Executors.newSingleThreadExecutor()))
-        } else {
-            RequestQueue(cache, network)
-        }
+        requestQueue =
+            if (testing) {
+                RequestQueue(cache, network, 1, ExecutorDelivery(Executors.newSingleThreadExecutor()))
+            } else {
+                RequestQueue(cache, network)
+            }
 
-        val serverURL = try {
-            URL(JoinableApplication.SERVER_URL)
-        } catch (e: MalformedURLException) {
-            Log.e(TAG, "Bad server URL: ${JoinableApplication.SERVER_URL}", e)
-            null
-        }
+        val serverURL =
+            try {
+                URL(JoinableApplication.SERVER_URL)
+            } catch (e: MalformedURLException) {
+                Log.e(tag, "Bad server URL: ${JoinableApplication.SERVER_URL}", e)
+                null
+            }
 
         if (serverURL != null) {
             Thread {
@@ -148,19 +169,25 @@ class Client private constructor() {
                 for (i in 0 until MAX_STARTUP_RETRIES) {
                     try {
                         val connection = serverURL.openConnection() as HttpURLConnection
-                        val body = BufferedReader(InputStreamReader(connection.inputStream))
-                            .lines().collect(Collectors.joining("\n"))
+                        val body =
+                            BufferedReader(InputStreamReader(connection.inputStream))
+                                .lines()
+                                .collect(Collectors.joining("\n"))
                         if (body != CHECK_SERVER_RESPONSE) throw IllegalStateException("Invalid response")
                         connection.disconnect()
                         this.connected.complete(true)
                         requestQueue.start()
                         connected = true
                         break
-                    } catch (ignored: Exception) {}
-                    try { Thread.sleep(INITIAL_CONNECTION_RETRY_DELAY) } catch (ignored: InterruptedException) {}
+                    } catch (ignored: Exception) {
+                    }
+                    try {
+                        Thread.sleep(INITIAL_CONNECTION_RETRY_DELAY)
+                    } catch (ignored: InterruptedException) {
+                    }
                 }
                 if (!connected) {
-                    Log.e(TAG, "Client couldn't connect")
+                    Log.e(tag, "Client couldn't connect")
                 }
             }.start()
         }

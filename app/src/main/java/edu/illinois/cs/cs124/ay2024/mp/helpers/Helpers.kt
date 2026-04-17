@@ -3,7 +3,6 @@ package edu.illinois.cs.cs124.ay2024.mp.helpers
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule
-import edu.illinois.cs.cs124.ay2024.mp.network.Server
 import java.nio.charset.StandardCharsets
 import java.util.Scanner
 
@@ -17,7 +16,7 @@ object Helpers {
     @JvmStatic
     fun readRSODataFile(): String =
         Scanner(
-            Server::class.java.getResourceAsStream("/rsos.json"),
+            Helpers::class.java.getResourceAsStream("/rsos.json"),
             StandardCharsets.UTF_8,
         ).useDelimiter("\\A").next()
 }
