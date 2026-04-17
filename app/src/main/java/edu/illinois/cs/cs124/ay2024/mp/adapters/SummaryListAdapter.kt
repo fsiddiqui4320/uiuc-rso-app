@@ -32,17 +32,26 @@ class SummaryListAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val summary = summaries[position]
         val title = holder.itemView.findViewById<TextView>(R.id.title)
+        val subtitle = holder.itemView.findViewById<TextView>(R.id.subtitle)
+        val accentBar = holder.itemView.findViewById<View>(R.id.accent_bar)
         val layout = holder.itemView.findViewById<LinearLayout>(R.id.layout)
 
         title.text = summary.title
-        title.setTextColor(activity.getColor(R.color.darkTextColor))
 
-        val backgroundColor = when (summary.color) {
-            Summary.Color.ORANGE -> activity.getColor(R.color.lighterIllinoisOrange)
-            Summary.Color.BLUE -> activity.getColor(R.color.lighterIllinoisBlue)
-            Summary.Color.DEPARTMENT -> activity.getColor(R.color.departmentColor)
+        when (summary.color) {
+            Summary.Color.ORANGE -> {
+                accentBar.setBackgroundColor(activity.getColor(R.color.illinoisOrange))
+                subtitle.text = "Student Organization"
+            }
+            Summary.Color.BLUE -> {
+                accentBar.setBackgroundColor(activity.getColor(R.color.illinoisBlue))
+                subtitle.text = "Student Organization"
+            }
+            Summary.Color.DEPARTMENT -> {
+                accentBar.setBackgroundColor(activity.getColor(R.color.departmentColor))
+                subtitle.text = "Department"
+            }
         }
-        layout.setBackgroundColor(backgroundColor)
 
         onClickCallback?.let { callback ->
             layout.setOnClickListener { callback.accept(summary) }
